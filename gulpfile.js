@@ -23,8 +23,10 @@ gulp.task('server', () => {
 });
 
 
+
+
 // Style
-gulp.task('sass', async => {
+gulp.task('sass', async () => {
 	gulp.src('app/sass/**/*.sass') // Getting all items.
 		/*............	Create style.css 		............*/
 		.pipe(sourcemaps.init()) // Wrap tasks in a sourcemap.
@@ -44,7 +46,7 @@ gulp.task('sass', async => {
 		.pipe(autoprefixer()) // Add the desired vendor prefixes.
 	    .pipe(sourcemaps.write()) // Create sourcemap.
 	    .pipe(gulp.dest('app/css/')) // Create style.css.
-        .pipe(browserSync.stream()); // Sass live reload.
+		.pipe(browserSync.stream()); // Sass live reload.
 });
 
 
@@ -53,37 +55,37 @@ gulp.task('sass', async => {
 gulp.task("lib", () => {
 	gulp.src([
 		'PATH/**/*.js', //add lib item
-		'',//add lib item
+		'', //add lib item
 	]) // Getting all items.
 	.pipe(concat('libs.min.js'))// Add path  to files for create new lib.
 	.pipe(uglify())
 	.gulp(gulp.dest('app/js/'))
-    .pipe(browserSync.stream()); // JS live reload.
+    .pipe(browserSync.reload()); // JS live reload.
 
 })
 
-gulp.task("script", async () => {
+gulp.task("script", () => {
 	gulp.src('app/js/**/*.js') // Getting all script items.
-		.pipe(sourcemaps.init()) // Wrap tasks in a sourcemap.
 		.pipe(concat('script.min.js')) // Concatenate style files.
-		.pipe(uglify())
-	    .pipe(sourcemaps.write()) // Create sourcemap.
+		.pipe(uglify()) // Minify js 
 	    .pipe(gulp.dest('app/js/')) // Create script.min.js.
-        .pipe(browserSync.stream()); // JS live reload.
+        .pipe(browserSync.reload({ stream: true })); // JS live reload.
 
 })
-// Image processing
 
-
+gulp.task('code', async () => {
+	gulp.src('app/**/*.html')
+		.pipe(browserSync.reload({ stream: true }));
+});
 
 // Watch
 gulp.task("watch", () => {
 	gulp.watch('app/sass/**/*.sass', gulp.parallel('sass')); // SASS live reload
-    gulp.watch("app/*.html").on('change', browserSync.reload);// HTML live reload
+    gulp.watch('app/*.html', gulp.parallel('code'));// HTML live reload
     gulp.watch('app/js/*.js', gulp.parallel('script')); // JS live reload
 })
 
-gulp.task("default", gulp.parallel('server', 'watch'))
+gulp.task('default', gulp.parallel('sass', 'script', 'server', 'watch'));
 
 
 
